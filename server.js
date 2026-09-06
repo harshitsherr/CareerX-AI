@@ -7,10 +7,17 @@ dotenv.config();
 
 const app = express();
 
+// ---------------------------------------
+// MIDDLEWARE
+// ---------------------------------------
+
 app.use(cors());
 app.use(express.json({ limit: "2mb" }));
 
-// Gemini client
+// ---------------------------------------
+// GEMINI CLIENT
+// ---------------------------------------
+
 const ai = new GoogleGenAI({
   apiKey: process.env.GEMINI_API_KEY,
 });
@@ -18,8 +25,10 @@ const ai = new GoogleGenAI({
 // ---------------------------------------
 // BASIC HEALTH CHECK
 // ---------------------------------------
+
 app.get("/", (req, res) => {
   res.json({
+    success: true,
     message: "CareerX AI backend is running",
   });
 });
@@ -27,12 +36,13 @@ app.get("/", (req, res) => {
 // ---------------------------------------
 // GEMINI CONNECTION TEST
 // ---------------------------------------
+
 app.get("/api/test-ai", async (req, res) => {
   try {
     if (!process.env.GEMINI_API_KEY) {
       return res.status(500).json({
         success: false,
-        error: "GEMINI_API_KEY is missing from .env",
+        error: "GEMINI_API_KEY is missing from environment variables",
       });
     }
 
@@ -59,11 +69,11 @@ app.get("/api/test-ai", async (req, res) => {
 // ---------------------------------------
 // RESUME ANALYSIS
 // ---------------------------------------
+
 app.post("/api/analyze-resume", async (req, res) => {
   try {
     const { resumeText } = req.body;
 
-    // Validate resume text
     if (!resumeText || !resumeText.trim()) {
       return res.status(400).json({
         success: false,
@@ -71,11 +81,10 @@ app.post("/api/analyze-resume", async (req, res) => {
       });
     }
 
-    // Validate Gemini key
     if (!process.env.GEMINI_API_KEY) {
       return res.status(500).json({
         success: false,
-        error: "GEMINI_API_KEY is missing from .env",
+        error: "GEMINI_API_KEY is missing from environment variables",
       });
     }
 
@@ -83,17 +92,12 @@ app.post("/api/analyze-resume", async (req, res) => {
       `Analyzing resume (${resumeText.length} characters)...`
     );
 
-    // Models are attempted in order.
-    // The first available model that succeeds is used.
     const models = [
       "gemini-3.6-flash",
       "gemini-3.7-flash",
       "gemini-2.5-flash",
       "gemini-2.5-flash-lite",
     ];
-
-    let response = null;
-    let lastError = null;
 
     const prompt = `
 You are CareerX AI, an intelligent career guidance assistant
@@ -195,9 +199,9 @@ RESUME:
 ${resumeText}
 `;
 
-    // ---------------------------------------
-    // TRY GEMINI MODELS
-    // ---------------------------------------
+    let response = null;
+    let lastError = null;
+
     for (const modelName of models) {
       try {
         console.log(`Trying Gemini model: ${modelName}`);
@@ -223,7 +227,6 @@ ${resumeText}
       }
     }
 
-    // No model succeeded
     if (!response) {
       return res.status(503).json({
         success: false,
@@ -233,16 +236,10 @@ ${resumeText}
       });
     }
 
-    // ---------------------------------------
-    // CLEAN GEMINI RESPONSE
-    // ---------------------------------------
-    const rawText = response.text.trim();
+    let cleanText = response.text.trim();
 
     console.log("Gemini response received.");
 
-    let cleanText = rawText;
-
-    // Remove accidental markdown fences
     if (cleanText.startsWith("```")) {
       cleanText = cleanText
         .replace(/^```json\s*/i, "")
@@ -251,9 +248,6 @@ ${resumeText}
         .trim();
     }
 
-    // ---------------------------------------
-    // PARSE JSON
-    // ---------------------------------------
     let analysis;
 
     try {
@@ -273,14 +267,10 @@ ${resumeText}
       });
     }
 
-    // ---------------------------------------
-    // RETURN ANALYSIS
-    // ---------------------------------------
     res.json({
       success: true,
       analysis,
     });
-
   } catch (error) {
     console.error(
       "Resume analysis error:",
@@ -295,29 +285,33 @@ ${resumeText}
     });
   }
 });
+
 // ---------------------------------------
 // MOCK INTERVIEW - GENERATE QUESTION
 // ---------------------------------------
-app.post("/api/mock-interview/question", async (req, res) => {
-  try {
-    const {
-      career,
-      skills,
-      questionNumber,
-    } = req.body;
 
-    if (!career) {
-      return res.status(400).json({
-        success: false,
-        error: "Career is required.",
-      });
-    }
+app.post(
+  "/api/mock-interview/question",
+  async (req, res) => {
+    try {
+      const {
+        career,
+        skills,
+        questionNumber,
+      } = req.body;
 
-    const skillList = Array.isArray(skills)
-      ? skills.join(", ")
-      : "";
+      if (!career) {
+        return res.status(400).json({
+          success: false,
+          error: "Career is required.",
+        });
+      }
 
-    const prompt = `
+      const skillList = Array.isArray(skills)
+        ? skills.join(", ")
+        : "";
+
+      const prompt = `
 You are CareerX AI, an expert technical and HR interviewer.
 
 Generate ONE realistic interview question for a candidate
@@ -343,88 +337,96 @@ Requirements:
 - Do not add explanations.
 `;
 
-    const models = [
-      "gemini-3.6-flash",
-      "gemini-3.7-flash",
-      "gemini-2.5-flash",
-      "gemini-2.5-flash-lite",
-    ];
+      const models = [
+        "gemini-3.6-flash",
+        "gemini-3.7-flash",
+        "gemini-2.5-flash",
+        "gemini-2.5-flash-lite",
+      ];
 
-    let response = null;
-    let lastError = null;
+      let response = null;
+      let lastError = null;
 
-    for (const modelName of models) {
-      try {
-        console.log(
-          `Mock interview question: trying ${modelName}`
-        );
+      for (const modelName of models) {
+        try {
+          console.log(
+            `Mock interview question: trying ${modelName}`
+          );
 
-        response = await ai.models.generateContent({
-          model: modelName,
-          contents: prompt,
-        });
+          response = await ai.models.generateContent({
+            model: modelName,
+            contents: prompt,
+          });
 
-        break;
-      } catch (error) {
-        lastError = error;
+          break;
+        } catch (error) {
+          lastError = error;
 
-        console.error(
-          `Mock interview question failed with ${modelName}:`,
-          error.message
-        );
+          console.error(
+            `Mock interview question failed with ${modelName}:`,
+            error.message
+          );
+        }
       }
-    }
 
-    if (!response) {
-      return res.status(503).json({
+      if (!response) {
+        return res.status(503).json({
+          success: false,
+          error:
+            lastError?.message ||
+            "All Gemini models are unavailable.",
+        });
+      }
+
+      const question = response.text.trim();
+
+      res.json({
+        success: true,
+        question,
+      });
+    } catch (error) {
+      console.error(
+        "Mock interview question error:",
+        error
+      );
+
+      res.status(500).json({
         success: false,
         error:
-          lastError?.message ||
-          "All Gemini models are unavailable.",
+          error.message ||
+          "Failed to generate interview question.",
       });
     }
-
-    const question = response.text.trim();
-
-    res.json({
-      success: true,
-      question,
-    });
-  } catch (error) {
-    console.error(
-      "Mock interview question error:",
-      error
-    );
-
-    res.status(500).json({
-      success: false,
-      error:
-        error.message ||
-        "Failed to generate interview question.",
-    });
   }
-});
+);
 
 // ---------------------------------------
 // MOCK INTERVIEW - EVALUATE ANSWER
 // ---------------------------------------
-app.post("/api/mock-interview/evaluate", async (req, res) => {
-  try {
-    const {
-      career,
-      question,
-      answer,
-    } = req.body;
 
-    if (!career || !question || !answer?.trim()) {
-      return res.status(400).json({
-        success: false,
-        error:
-          "Career, question and answer are required.",
-      });
-    }
+app.post(
+  "/api/mock-interview/evaluate",
+  async (req, res) => {
+    try {
+      const {
+        career,
+        question,
+        answer,
+      } = req.body;
 
-    const prompt = `
+      if (
+        !career ||
+        !question ||
+        !answer?.trim()
+      ) {
+        return res.status(400).json({
+          success: false,
+          error:
+            "Career, question and answer are required.",
+        });
+      }
+
+      const prompt = `
 You are CareerX AI, an expert interview evaluator.
 
 Evaluate the candidate's answer to the following interview question.
@@ -462,100 +464,103 @@ Rules:
 10. Do not use markdown or code fences.
 `;
 
-    const models = [
-      "gemini-3.6-flash",
-      "gemini-3.7-flash",
-      "gemini-2.5-flash",
-      "gemini-2.5-flash-lite",
-    ];
+      const models = [
+        "gemini-3.6-flash",
+        "gemini-3.7-flash",
+        "gemini-2.5-flash",
+        "gemini-2.5-flash-lite",
+      ];
 
-    let response = null;
-    let lastError = null;
+      let response = null;
+      let lastError = null;
 
-    for (const modelName of models) {
-      try {
-        console.log(
-          `Mock interview evaluation: trying ${modelName}`
-        );
+      for (const modelName of models) {
+        try {
+          console.log(
+            `Mock interview evaluation: trying ${modelName}`
+          );
 
-        response = await ai.models.generateContent({
-          model: modelName,
-          contents: prompt,
-        });
+          response = await ai.models.generateContent({
+            model: modelName,
+            contents: prompt,
+          });
 
-        break;
-      } catch (error) {
-        lastError = error;
+          break;
+        } catch (error) {
+          lastError = error;
 
-        console.error(
-          `Mock interview evaluation failed with ${modelName}:`,
-          error.message
-        );
+          console.error(
+            `Mock interview evaluation failed with ${modelName}:`,
+            error.message
+          );
+        }
       }
-    }
 
-    if (!response) {
-      return res.status(503).json({
-        success: false,
-        error:
-          lastError?.message ||
-          "All Gemini models are unavailable.",
+      if (!response) {
+        return res.status(503).json({
+          success: false,
+          error:
+            lastError?.message ||
+            "All Gemini models are unavailable.",
+        });
+      }
+
+      let cleanText = response.text.trim();
+
+      if (cleanText.startsWith("```")) {
+        cleanText = cleanText
+          .replace(/^```json\s*/i, "")
+          .replace(/^```\s*/i, "")
+          .replace(/\s*```$/i, "")
+          .trim();
+      }
+
+      let feedback;
+
+      try {
+        feedback = JSON.parse(cleanText);
+      } catch (parseError) {
+        console.error(
+          "Mock interview JSON parsing failed."
+        );
+
+        console.error(cleanText);
+
+        return res.status(500).json({
+          success: false,
+          error:
+            "Gemini returned an invalid interview evaluation.",
+        });
+      }
+
+      res.json({
+        success: true,
+        feedback,
       });
-    }
-
-    let cleanText = response.text.trim();
-
-    if (cleanText.startsWith("```")) {
-      cleanText = cleanText
-        .replace(/^```json\s*/i, "")
-        .replace(/^```\s*/i, "")
-        .replace(/\s*```$/i, "")
-        .trim();
-    }
-
-    let feedback;
-
-    try {
-      feedback = JSON.parse(cleanText);
-    } catch (parseError) {
+    } catch (error) {
       console.error(
-        "Mock interview JSON parsing failed:"
+        "Mock interview evaluation error:",
+        error
       );
 
-      console.error(cleanText);
-
-      return res.status(500).json({
+      res.status(500).json({
         success: false,
         error:
-          "Gemini returned an invalid interview evaluation.",
+          error.message ||
+          "Failed to evaluate interview answer.",
       });
     }
-
-    res.json({
-      success: true,
-      feedback,
-    });
-  } catch (error) {
-    console.error(
-      "Mock interview evaluation error:",
-      error
-    );
-
-    res.status(500).json({
-      success: false,
-      error:
-        error.message ||
-        "Failed to evaluate interview answer.",
-    });
   }
-});
+);
+
 // ---------------------------------------
 // START SERVER
 // ---------------------------------------
+
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
+app.listen(PORT, "0.0.0.0", () => {
   console.log(
-    `CareerX backend running on http://localhost:${PORT}`
+    `CareerX backend running on http://0.0.0.0:${PORT}`
   );
 });

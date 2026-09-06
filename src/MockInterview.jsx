@@ -66,7 +66,7 @@ function MockInterview() {
       setAnswer("");
 
       const response = await fetch(
-        "http://localhost:5000/api/mock-interview/question",
+       https://careerx-ai-yp5x.onrender.com/api/mock-interview/question
         {
           method: "POST",
           headers: {
@@ -122,7 +122,7 @@ function MockInterview() {
       setLoading(true);
 
       const response = await fetch(
-        "http://localhost:5000/api/mock-interview/evaluate",
+      https://careerx-ai-yp5x.onrender.com/api/mock-interview/evaluate
         {
           method: "POST",
           headers: {

@@ -22,6 +22,41 @@ const ai = new GoogleGenAI({
   apiKey: process.env.GEMINI_API_KEY,
 });
 
+const GEMINI_MODELS = [
+  "gemini-3.8-flash",
+  "gemini-3.7-flash",
+  "gemini-3.6-flash",
+  "gemini-3.5-flash-lite",
+];
+
+async function generateWithFallback(prompt) {
+  let lastError = null;
+
+  for (const modelName of GEMINI_MODELS) {
+    try {
+      console.log(`Trying Gemini model: ${modelName}`);
+
+      const response = await ai.models.generateContent({
+        model: modelName,
+        contents: prompt,
+      });
+
+      console.log(`Gemini model succeeded: ${modelName}`);
+      return response;
+    } catch (error) {
+      lastError = error;
+
+      console.error(`Gemini model failed: ${modelName}`);
+      console.error(error?.message || "Gemini request failed");
+    }
+  }
+
+  throw (
+    lastError ||
+    new Error("All Gemini models are currently unavailable.")
+  );
+}
+
 // ---------------------------------------
 // BASIC HEALTH CHECK
 // ---------------------------------------
@@ -46,11 +81,9 @@ app.get("/api/test-ai", async (req, res) => {
       });
     }
 
-    const response = await ai.models.generateContent({
-      model: "gemini-3.6-flash",
-      contents:
-        "Reply with exactly: CareerX Gemini connection successful",
-    });
+    const response = await generateWithFallback(
+      "Reply with exactly: CareerX Gemini connection successful"
+    );
 
     res.json({
       success: true,
@@ -91,13 +124,6 @@ app.post("/api/analyze-resume", async (req, res) => {
     console.log(
       `Analyzing resume (${resumeText.length} characters)...`
     );
-
-    const models = [
-  "gemini-3.5-flash-lite",
-  "gemini-3.6-flash",
-  "gemini-3.5-flash",
-];
-    
 
     const prompt = `
 You are CareerX AI, an intelligent career guidance assistant
@@ -199,40 +225,14 @@ RESUME:
 ${resumeText}
 `;
 
-    let response = null;
-    let lastError = null;
+    let response;
 
-    for (const modelName of models) {
-      try {
-        console.log(`Trying Gemini model: ${modelName}`);
-
-        response = await ai.models.generateContent({
-          model: modelName,
-          contents: prompt,
-        });
-
-        console.log(
-          `Gemini model succeeded: ${modelName}`
-        );
-
-        break;
-      } catch (error) {
-        lastError = error;
-
-        console.error(
-          `Gemini model failed: ${modelName}`
-        );
-
-        console.error(error.message);
-      }
-    }
-
-    if (!response) {
+    try {
+      response = await generateWithFallback(prompt);
+    } catch (error) {
       return res.status(503).json({
         success: false,
-        error:
-          lastError?.message ||
-          "All Gemini models are currently unavailable.",
+        error: error?.message || "All Gemini models are currently unavailable.",
       });
     }
 
@@ -337,44 +337,14 @@ Requirements:
 - Do not add explanations.
 `;
 
-      const models = [
-        "gemini-3.6-flash",
-        "gemini-3.7-flash",
-        "gemini-2.5-flash",
-        "gemini-2.5-flash-lite",
-      ];
+      let response;
 
-      let response = null;
-      let lastError = null;
-
-      for (const modelName of models) {
-        try {
-          console.log(
-            `Mock interview question: trying ${modelName}`
-          );
-
-          response = await ai.models.generateContent({
-            model: modelName,
-            contents: prompt,
-          });
-
-          break;
-        } catch (error) {
-          lastError = error;
-
-          console.error(
-            `Mock interview question failed with ${modelName}:`,
-            error.message
-          );
-        }
-      }
-
-      if (!response) {
+      try {
+        response = await generateWithFallback(prompt);
+      } catch (error) {
         return res.status(503).json({
           success: false,
-          error:
-            lastError?.message ||
-            "All Gemini models are unavailable.",
+          error: error?.message || "All Gemini models are unavailable.",
         });
       }
 
@@ -464,44 +434,14 @@ Rules:
 10. Do not use markdown or code fences.
 `;
 
-      const models = [
-        "gemini-3.6-flash",
-        "gemini-3.7-flash",
-        "gemini-2.5-flash",
-        "gemini-2.5-flash-lite",
-      ];
+      let response;
 
-      let response = null;
-      let lastError = null;
-
-      for (const modelName of models) {
-        try {
-          console.log(
-            `Mock interview evaluation: trying ${modelName}`
-          );
-
-          response = await ai.models.generateContent({
-            model: modelName,
-            contents: prompt,
-          });
-
-          break;
-        } catch (error) {
-          lastError = error;
-
-          console.error(
-            `Mock interview evaluation failed with ${modelName}:`,
-            error.message
-          );
-        }
-      }
-
-      if (!response) {
+      try {
+        response = await generateWithFallback(prompt);
+      } catch (error) {
         return res.status(503).json({
           success: false,
-          error:
-            lastError?.message ||
-            "All Gemini models are unavailable.",
+          error: error?.message || "All Gemini models are unavailable.",
         });
       }
 

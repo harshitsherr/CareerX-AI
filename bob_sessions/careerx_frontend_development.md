@@ -1,7 +1,7 @@
 # CareerX Frontend Development Session
 
 ## Objective
-Build the user-facing React interface for CareerX with polished landing and dashboard screens.
+Build the user-facing React interface for CareerX using IBM Bob as the primary development environment and AI-assisted implementation tool.
 
 ## Work Completed
 - Created the landing page hero section and feature grid.
@@ -20,4 +20,4 @@ Build the user-facing React interface for CareerX with polished landing and dash
 The UI was created to feel modern and trustworthy while staying easy to navigate. The design emphasizes clarity of workflow and strong career-oriented messaging.
 
 ## Result
-The frontend provides a complete user-facing experience for CareerX, while keeping logic and API flows separate and maintainable.
+The frontend provides a complete user-facing experience for CareerX while keeping logic and API flows separate and maintainable. IBM Bob supported the build process as the primary development environment and AI-assisted coding partner.

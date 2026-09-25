@@ -1,10 +1,10 @@
 # CareerX AI Development Session
 
 ## Objective
-Integrate AI-powered career analysis and guidance into the app using Gemini and structured prompt design.
+Integrate AI-powered career analysis and guidance into the app using IBM Bob as the primary development environment and the Gemini API as the application’s generative AI service.
 
 ## Work Completed
-- Added Express API endpoint for resume analysis.
+- Added an Express API endpoint for resume analysis.
 - Implemented environment-based configuration for Google Gemini access.
 - Built a structured JSON prompt to produce analysis output.
 - Ensured the AI output is constrained to realistic, evidence-based recommendations.
@@ -14,7 +14,7 @@ Integrate AI-powered career analysis and guidance into the app using Gemini and 
 1. User uploads a PDF resume.
 2. PDF text is extracted.
 3. The text is posted to the backend API.
-4. Gemini receives the prompt and generates a structured JSON result.
+4. Gemini API receives the prompt and generates a structured JSON result.
 5. The app validates the output and displays analysis results.
 
 ## Output Fields
@@ -32,4 +32,4 @@ Integrate AI-powered career analysis and guidance into the app using Gemini and 
 - improvements
 
 ## Result
-The AI layer dynamically interprets resume content and returns actionable insights aligned with the user’s actual background and role fit.
+The AI layer dynamically interprets resume content and returns actionable insights aligned with the user’s actual background and role fit. IBM Bob supported the development process, while Gemini API provided the actual generative AI capabilities used by the application.

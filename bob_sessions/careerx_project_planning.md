@@ -1,7 +1,7 @@
 # CareerX Project Planning Session
 
 ## Objective
-Define the scope, features, and structure of the CareerX platform using IBM Bob as an AI planning assistant.
+Define the scope, features, and structure of the CareerX platform using IBM Bob as the primary development environment and AI-assisted development tool.
 
 ## Key Discussion Points
 - Build a single app for career guidance, skill assessment, resume analysis, and planning.
@@ -38,11 +38,11 @@ Define the scope, features, and structure of the CareerX platform using IBM Bob 
    - Firebase-based user state and saved results
 
 ## Implementation Strategy
-- Set up React + Vite frontend for the UI experience.
+- Use IBM Bob as the primary development environment and AI-assisted implementation partner.
+- Set up a React + Vite frontend for the UI experience.
 - Use Express as the backend API layer.
-- Use Google Gemini API for AI analysis.
-- Use Firebase Firestore to store user analysis and progress.
+- Use the Google Gemini API for the application’s generative AI capabilities.
 - Keep deployment simple through Render-compatible configuration.
 
 ## Outcome
-The project was broken into manageable modules that aligned with CareerX’s core value proposition and could be developed iteratively in Visual Studio Code with IBM Bob as an implementation partner.
+The project was broken into manageable modules that aligned with CareerX’s core value proposition and could be developed iteratively with IBM Bob as the primary development environment and AI-assisted planning partner.

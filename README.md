@@ -1,16 +1,43 @@
-# React + Vite
+# CareerX-AI — AI Career Copilot
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+CareerX-AI is an AI-powered career guidance application designed to help students and early-career professionals understand their strengths, identify skill gaps, and plan a practical path toward their target roles.
 
-Currently, two official plugins are available:
+## What the app does
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- Resume and skill analysis
+- Career-path recommendations
+- Skill-gap identification
+- Personalized learning roadmap generation
+- AI mock interview question generation and evaluation
+- Career readiness guidance based on the user’s actual resume and background
 
-## React Compiler
+## Built with IBM Bob
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+CareerX-AI was developed using IBM Bob as the primary development environment and AI-assisted coding tool. IBM Bob assisted with project planning, architecture, implementation, debugging, API integration, testing, and documentation throughout the project.
 
-## Expanding the Oxlint configuration
+Gemini API provides the generative AI capabilities used by the CareerX-AI application.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+## Development environment
+
+- Development Environment: IBM Bob
+- AI-Assisted Development Tool: IBM Bob
+- Frontend: React + Vite
+- Backend: Express.js
+- Generative AI service used by the application: Gemini API
+
+## How CareerX-AI works
+
+1. The user uploads a resume.
+2. The app extracts and analyzes the resume content.
+3. Gemini API evaluates the profile and returns structured insights.
+4. The application presents career matches, skill gaps, roadmap guidance, and mock interview support.
+
+## Local development
+
+```bash
+npm install
+npm run dev
+npm run server
+```
+
+This repository contains the CareerX-AI product, the IBM Bob development documentation, and the supporting project materials used during the build and validation process.

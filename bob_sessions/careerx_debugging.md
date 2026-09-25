@@ -1,7 +1,7 @@
 # CareerX Debugging Session
 
 ## Objective
-Resolve issues in the local app workflow, especially around resume extraction, API calls, and consistency of AI output.
+Resolve issues in the local app workflow, especially around resume extraction, API calls, and consistency of AI output, using IBM Bob as the primary development environment and AI-assisted debugging tool.
 
 ## Issues Addressed
 - Validate the AI API key and backend configuration.
@@ -16,8 +16,8 @@ Resolve issues in the local app workflow, especially around resume extraction, A
 - Read the error from the backend logs.
 - Narrow the issue to a specific request or component flow.
 - Provide the error and context to IBM Bob for solution iteration.
-- Apply the fix in VS Code.
+- Apply the fix in the IBM Bob development environment.
 - Re-test the flow end-to-end.
 
 ## Result
-The app is more resilient to real-world edge cases, and the resume analysis process behaves consistently even when the input or API response is imperfect.
+The app is more resilient to real-world edge cases, and the resume analysis process behaves consistently even when the input or API response is imperfect. IBM Bob supported the debugging workflow, while the Gemini API remained the application’s generative AI service.
